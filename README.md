@@ -1,56 +1,80 @@
 # Forja
 
-Aplicativo web de desenvolvimento pessoal com planejamento por ciclos, prioridades diárias, ferramentas de organização e acompanhamento da evolução.
+Aplicativo de desenvolvimento pessoal com ciclos de 30 dias, prioridades diárias e ferramentas de acompanhamento. A versão de produção é um app Next.js. O monolito antigo saiu deste deploy; o conteúdo dele continua no histórico do Git.
 
-> Repositório privado. Este projeto é uma aplicação estática: o arquivo principal é `index.html`.
+## O que falta para publicar
 
-## Estrutura
+A landing de venda é outro projeto (Vite) e só manda o visitante para o checkout da Hotmart. Este repositório é o app: login, webhook e liberação da assinatura.
 
-```text
-forja/
-├── index.html              # Aplicação completa
-├── README.md               # Este guia
-├── .gitignore              # Arquivos locais ignorados pelo Git
-├── .nojekyll               # Evita processamento Jekyll no GitHub Pages
-├── LICENSE                 # Não incluída: repositório privado e direitos reservados
-├── docs/
-│   └── PUBLICACAO.md       # Orientações de publicação
-└── supabase/
-    └── schema.sql          # Tabela e políticas de segurança da sincronização
+- [ ] Liberar o acesso à Vercel deste repositório.
+- [ ] Liberar o acesso ao projeto Supabase.
+- [ ] No SQL Editor do Supabase, executar [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
+- [ ] Em Authentication → URL Configuration, colocar a URL do site e `https://SEU_DOMINIO/auth/callback` como redirect.
+- [ ] Comprar o domínio.
+- [ ] Adicionar o domínio na Vercel, no projeto deste app.
+- [ ] Na Vercel, preencher `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `HOTMART_HOTTOK`, `HOTMART_PRODUCT_ID`, `HOTMART_CHECKOUT_URL` e `BILLING_ALLOW_OVERDUE`.
+- [ ] No painel da Hotmart, criar o webhook versão 2.0.0 para `https://SEU_DOMINIO/api/webhooks/hotmart`, com o header `X-HOTMART-HOTTOK`.
+- [ ] Copiar o token para `HOTMART_HOTTOK` e o id numérico do produto para `HOTMART_PRODUCT_ID`. O código `P108444964Q` da URL de pagamento não é esse id.
+- [ ] Na landing Vite, definir `VITE_APP_URL` com o domínio deste app. O link “Já assinei” abre `/signup`.
+- [ ] Fazer uma compra de teste com o mesmo e-mail da conta e conferir a linha em `entitlements`.
+- [ ] Só então ligar `BILLING_ENFORCED=true`. Enquanto estiver `false`, qualquer usuário logado entra.
+
+## O que o visitante vê
+
+- Sem conta: apenas a landing page.
+- Com conta e sem assinatura ativa: tela de acesso bloqueado, com o link de compra da Hotmart.
+- Com assinatura ativa: o aplicativo completo (ciclo, ferramentas, histórico e sincronização).
+
+O checkout em si continua na Hotmart. Este repositório recebe o webhook, grava o direito de acesso e libera o app. Durante o desenvolvimento, `BILLING_ENFORCED=false` deixa entrar qualquer usuário autenticado.
+
+## Rodar localmente
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-## Executar localmente
+Abra `http://localhost:3000`.
 
-1. Baixe ou clone o repositório.
-2. Abra `index.html` no navegador.
-3. Os dados locais são armazenados no `localStorage` do navegador.
+Preencha pelo menos `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Sem isso, a landing abre, mas login e sincronização não funcionam.
 
-**Atenção:** a sincronização/conta na nuvem depende de a aplicação estar hospedada em HTTP/HTTPS e da configuração do Supabase. Abrir o arquivo diretamente (`file://`) desativa a conexão com a nuvem no código atual.
+## Supabase
 
-## Supabase (sincronização na nuvem)
+1. No SQL Editor, execute [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
+2. Em Authentication → URL Configuration, coloque a URL do site e `https://SEU_DOMINIO/auth/callback` como redirect.
+3. A tabela `app_data` guarda o mesmo JSON de antes (`d`, `g`, `forja`, `hc`, `cc`, `off`, `ut`). Quem já tem dados nessa tabela continua compatível. O navegador também usa a chave `disc1`.
+4. A tabela `entitlements` guarda a assinatura. O cliente só pode ler a própria linha. Quem grava é o webhook, com a `service_role`.
+5. Fotos de perfil vão para o bucket `avatars`. O JSON guarda o caminho, não mais a imagem inteira.
 
-O código contém a URL do projeto Supabase e uma chave publicável (`sb_publishable_...`). Chaves publicáveis podem ficar no frontend, desde que as tabelas estejam protegidas por Row Level Security (RLS). Nunca coloque `service_role`, segredo de backend ou senha neste repositório/frontend.
+Nunca coloque `SUPABASE_SERVICE_ROLE_KEY` nem `HOTMART_HOTTOK` em variável `NEXT_PUBLIC_`.
 
-1. Abra o projeto Supabase associado ao Forja.
-2. Entre no **SQL Editor**.
-3. Execute o conteúdo de [`supabase/schema.sql`](supabase/schema.sql).
-4. Em **Authentication → URL Configuration**, configure a URL pública do site e as URLs de redirecionamento de recuperação de senha.
-5. Publique o site em HTTPS.
-6. Teste criar conta, confirmar e-mail, entrar, sincronizar, sair e recuperar senha.
+## Hotmart
 
-A aplicação espera uma tabela `public.app_data` com `user_id`, `data` e `updated_at`. As políticas RLS devem permitir que cada usuário leia e altere somente a própria linha.
+Quando o produto estiver no ar:
 
-## Publicar com GitHub Pages
+1. No webhook do produto, aponte para `https://SEU_DOMINIO/api/webhooks/hotmart`.
+2. Use a versão 2.0.0 e envie o header `X-HOTMART-HOTTOK`.
+3. Copie o token para `HOTMART_HOTTOK` e o id numérico do produto para `HOTMART_PRODUCT_ID`. O código `P108444964Q` da URL de pagamento não é esse id.
+4. `HOTMART_CHECKOUT_URL` já aponta para `https://pay.hotmart.com/P108444964Q?bid=1794408607041`. A landing Vite usa o mesmo endereço.
+5. Ligue `BILLING_ENFORCED=true` só depois que uma compra de teste gravar a assinatura. O passo a passo está em “O que falta para publicar”.
 
-Veja [`docs/PUBLICACAO.md`](docs/PUBLICACAO.md). Como a aplicação é estática, não precisa de `npm install`, build ou servidor Node.
+Eventos tratados:
 
-## Dados e privacidade
+- `PURCHASE_APPROVED` e `PURCHASE_COMPLETE` liberam o acesso.
+- `PURCHASE_REFUNDED` e `PURCHASE_CHARGEBACK` revogam.
+- `SUBSCRIPTION_CANCELLATION` e status `EXPIRED` / `CANCELED_*` bloqueiam.
+- `OVERDUE` continua liberado, com aviso, enquanto `BILLING_ALLOW_OVERDUE` não for `false`.
 
-- Sem login/nuvem, os dados ficam no armazenamento local do navegador e não são automaticamente compartilhados entre dispositivos ou navegadores.
-- Com login e Supabase configurados, os dados podem ser sincronizados com a conta.
-- Antes de alterações importantes, mantenha backup dos dados. A sincronização atual compara o campo `ut` e pode solicitar escolha quando detectar versões diferentes.
-- Mantenha o repositório como **Private** no GitHub. Repositório privado não substitui controles de segurança do Supabase nem torna segura a publicação de segredos no código.
+O e-mail da compra precisa ser o mesmo e-mail da conta. O acesso não fica dentro dos dados do usuário, para ninguém alterar a própria assinatura no navegador.
 
-## Estado do projeto
+## Scripts
 
-Versão organizada a partir do HTML fornecido. O projeto ainda deve passar por testes funcionais em desktop e celular antes de ser considerado pronto para produção.
+- `npm run dev` — desenvolvimento
+- `npm run build` — build de produção
+- `npm test` — regras de domínio, backup e mapeamento do webhook
+- `npm run lint` — ESLint
+
+## Backup
+
+O arquivo exportado continua no formato `{ "app": "forja", "v": 1, "exp": "...", "data": { ... } }`. Dá para restaurar um backup gerado pela versão anterior.

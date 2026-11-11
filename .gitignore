@@ -18,3 +18,9 @@ Thumbs.db
 .env.*
 !.env.example
 secrets/
+
+# Next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo
