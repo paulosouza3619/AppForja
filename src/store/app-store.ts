@@ -8,11 +8,9 @@ export type SyncStatus = "idle" | "pend" | "sync" | "ok" | "err";
 
 interface AppStore {
   data: AppData;
-  hydrated: boolean;
   conflict: AppData | null;
   syncStatus: SyncStatus;
   syncError: string;
-  setHydrated: (value: boolean) => void;
   setSync: (status: SyncStatus, error?: string) => void;
   setConflict: (remote: AppData | null) => void;
   replaceData: (data: AppData) => void;
@@ -56,11 +54,9 @@ export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
       data: defaultAppData(),
-      hydrated: false,
       conflict: null,
       syncStatus: "idle",
       syncError: "",
-      setHydrated: (hydrated) => set({ hydrated }),
       setSync: (syncStatus, syncError = "") => set({ syncStatus, syncError }),
       setConflict: (conflict) => set({ conflict }),
       replaceData: (data) => set({ data: normalizeAppData(data), conflict: null }),
@@ -73,9 +69,6 @@ export const useAppStore = create<AppStore>()(
       name: STORAGE_KEY,
       storage: createJSONStorage(browserStorage),
       partialize: (state) => ({ data: state.data }) as unknown as AppStore,
-      onRehydrateStorage: () => () => {
-        useAppStore.setState({ hydrated: true });
-      },
     },
   ),
 );

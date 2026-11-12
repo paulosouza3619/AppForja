@@ -44,7 +44,7 @@ function SyncBridge({ ready }: { ready: boolean }) {
 export function AppFrame({ email, overdue, children }: { email: string; overdue: boolean; children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() => useAppStore.persist.hasHydrated());
   const onboarded = useAppStore((s) => Boolean(s.data.forja?.onboarded));
   const conflict = useAppStore((s) => s.conflict);
   const syncStatus = useAppStore((s) => s.syncStatus);
