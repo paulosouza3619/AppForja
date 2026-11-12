@@ -5,7 +5,7 @@ import { FOCUS_AREAS, TIME_OPTIONS, buildPlan, recommendedTools } from "@/domain
 import { MODULES } from "@/domain/catalog";
 import { defaultForja, type ForjaState } from "@/domain/types";
 import { updateData } from "@/store/actions";
-import { useAppStore } from "@/store/app-store";
+import { useAppStore, useForja } from "@/store/app-store";
 import { Button, useToast } from "@/components/ui";
 
 function readForja(): ForjaState {
@@ -18,7 +18,7 @@ function writeForja(forja: ForjaState) {
 
 export function Onboarding() {
   const toast = useToast();
-  const forja = useAppStore((s) => ({ ...defaultForja(), ...(s.data.forja || {}) }));
+  const forja = useForja();
   const [reason, setReason] = useState(forja.reason || "");
   const [goal, setGoal] = useState(forja.goal || "");
   const step = forja.step || 0;

@@ -10,12 +10,8 @@ import { defaultForja } from "@/domain/types";
 import { publicAvatarUrl, pushCloud, uploadAvatar } from "@/lib/sync";
 import { createBrowserSupabase } from "@/lib/supabase/client";
 import { updateData } from "@/store/actions";
-import { useAppStore } from "@/store/app-store";
+import { useAppStore, useForja } from "@/store/app-store";
 import { Button, Panel, useToast } from "@/components/ui";
-
-function useForja() {
-  return useAppStore((s) => ({ ...defaultForja(), ...(s.data.forja || {}) }));
-}
 
 export function EvolutionView() {
   const forja = useForja();

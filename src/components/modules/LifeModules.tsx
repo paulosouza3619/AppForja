@@ -7,14 +7,14 @@ import { BOSS_REWARDS, VICE_SUGGESTIONS, bossDisplayName, bossState } from "@/do
 import { MISSION_DIFFICULTIES, MISSION_LIMITS, MISSION_XP, activeMissionCount, missionProgress, missionStatus } from "@/domain/missions";
 import { OBJECTIVE_TERMS } from "@/domain/xp";
 import { onDay, sumField, weekSeries } from "@/domain/records";
-import type { LogEntry } from "@/domain/types";
+import { EMPTY_LOGS, type LogEntry } from "@/domain/types";
 import { addLog, missionXpToast, patchLog, removeLog, setGoals, toggleFlag, toggleTodo } from "@/store/actions";
 import { useAppStore } from "@/store/app-store";
 import { Bar, Button, Panel, WeekChart, controlClass, useToast } from "@/components/ui";
 
 export function TodoModule() {
   const toast = useToast();
-  const rows = useAppStore((s) => s.data.d.todo || []);
+  const rows = useAppStore((s) => s.data.d.todo ?? EMPTY_LOGS);
   const [cursor, setCursor] = useState(today().slice(0, 7));
   const [selected, setSelected] = useState(today());
   const [text, setText] = useState("");
@@ -243,7 +243,7 @@ function GoodHabits() {
 
 export function MissionsModule() {
   const toast = useToast();
-  const rows = useAppStore((s) => s.data.d.metas || []);
+  const rows = useAppStore((s) => s.data.d.metas ?? EMPTY_LOGS);
   const [filter, setFilter] = useState("Todas");
   const [form, setForm] = useState({ dif: "Média", area: "Física", termo: "Curto prazo", nome: "", ini: "", alvo: "", un: "", prazo: "" });
   const visible = rows.filter((row) => filter === "Todas" || missionStatus(row) === filter);
@@ -370,7 +370,7 @@ export function PeaceModule() {
 
 export function ObjectivesModule() {
   const toast = useToast();
-  const rows = useAppStore((s) => s.data.d.obj || []);
+  const rows = useAppStore((s) => s.data.d.obj ?? EMPTY_LOGS);
   const [nome, setNome] = useState("");
   const [termo, setTermo] = useState<keyof typeof OBJECTIVE_TERMS>("Curto prazo");
   const [prazo, setPrazo] = useState("");
@@ -409,7 +409,7 @@ function GoalField({ label, current, onSave }: { label: string; current: number;
 
 function SimpleForm({ module, fields }: { module: string; fields: [string, string, "text" | "number" | "select", string?][] }) {
   const toast = useToast();
-  const rows = useAppStore((s) => s.data.d[module] || []);
+  const rows = useAppStore((s) => s.data.d[module] ?? EMPTY_LOGS);
   const [values, setValues] = useState<Record<string, string>>({});
   return (
     <>

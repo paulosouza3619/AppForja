@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { defaultAppData, normalizeAppData, STORAGE_KEY, type AppData } from "@/domain/types";
+import { defaultAppData, defaultForja, normalizeAppData, STORAGE_KEY, type AppData, type ForjaState } from "@/domain/types";
 
 export type SyncStatus = "idle" | "pend" | "sync" | "ok" | "err";
 
@@ -72,3 +72,8 @@ export const useAppStore = create<AppStore>()(
     },
   ),
 );
+
+export function useForja(): ForjaState {
+  const forja = useAppStore((s) => s.data.forja);
+  return { ...defaultForja(), ...(forja || {}) };
+}

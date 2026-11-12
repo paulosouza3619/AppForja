@@ -6,12 +6,12 @@ import { MODULES, MODULE_IMAGES } from "@/domain/catalog";
 import { today } from "@/domain/dates";
 import { defaultForja } from "@/domain/types";
 import { updateData } from "@/store/actions";
-import { useAppStore } from "@/store/app-store";
+import { useForja } from "@/store/app-store";
 import { Button, Panel, useToast } from "@/components/ui";
 
 export function HomeView() {
   const toast = useToast();
-  const forja = useAppStore((s) => ({ ...defaultForja(), ...(s.data.forja || {}) }));
+  const forja = useForja();
   const stats = cycleStats(forja);
   const day = today();
   const done = forja.done[day] || {};

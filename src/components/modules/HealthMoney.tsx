@@ -5,13 +5,13 @@ import { ago, formatDay, monthKey, monthLabel, today } from "@/domain/dates";
 import { calcMacroGoals, calcWaterGoal, parsePortion, type ParsedPortion } from "@/domain/diet";
 import { brl, onDay, sumField, weekSeries } from "@/domain/records";
 import { CARDIO_MODES, EXERCISES, EXPENSE_CATEGORIES, INCOME_CATEGORIES, QUICK_EXPENSE, QUICK_INCOME, TRAIN_GROUPS } from "@/domain/catalog";
-import type { LogEntry } from "@/domain/types";
+import { EMPTY_LOGS, type LogEntry } from "@/domain/types";
 import { addLog, patchLog, removeLog, restoreLog, setGoals } from "@/store/actions";
 import { useAppStore } from "@/store/app-store";
 import { Bar, Button, Field, Panel, WeekChart, controlClass, useToast } from "@/components/ui";
 
 function useRows(module: string) {
-  return useAppStore((s) => s.data.d[module] || []);
+  return useAppStore((s) => s.data.d[module] ?? EMPTY_LOGS);
 }
 
 function History({ module, rows, label }: { module: string; rows: LogEntry[]; label: (row: LogEntry) => string }) {

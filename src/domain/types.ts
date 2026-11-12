@@ -126,6 +126,7 @@ export interface AppData {
 }
 
 export const STORAGE_KEY = "disc1";
+export const EMPTY_LOGS: LogEntry[] = [];
 
 export const DEFAULT_GOALS: Goals = {
   water: 2500,
