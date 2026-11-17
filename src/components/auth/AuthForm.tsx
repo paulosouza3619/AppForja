@@ -82,7 +82,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" | "recover" }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/forja-mark.png" alt="Forja" className="mx-auto mb-3 h-28 w-auto" />
         <h1 className="text-2xl font-extrabold">{title}</h1>
-        <p className="mt-2 text-sm text-mute">Use o mesmo e-mail da compra na Hotmart.</p>
+        <p className="mt-2 text-sm text-mute">Use seu e-mail para entrar e guardar seus dados.</p>
       </div>
       {missing ? <p className="mb-4 rounded-xl border border-danger p-3 text-sm text-danger">Configure NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY.</p> : null}
       <form onSubmit={onSubmit} className="space-y-3 rounded-2xl border border-line bg-card p-5">

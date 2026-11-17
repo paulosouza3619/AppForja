@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { cycleStats } from "@/domain/cycle";
+import { cycleStats, withRecordedActivity } from "@/domain/cycle";
 import { MODULES, MODULE_IMAGES } from "@/domain/catalog";
 import { today } from "@/domain/dates";
 import { defaultForja } from "@/domain/types";
 import { updateData } from "@/store/actions";
-import { useForja } from "@/store/app-store";
+import { useAppStore, useForja } from "@/store/app-store";
 import { Button, Panel, useToast } from "@/components/ui";
 
 export function HomeView() {
   const toast = useToast();
+  const data = useAppStore((s) => s.data);
   const forja = useForja();
-  const stats = cycleStats(forja);
+  const stats = cycleStats(withRecordedActivity(forja, data));
   const day = today();
   const done = forja.done[day] || {};
   const actions = forja.actions || [];

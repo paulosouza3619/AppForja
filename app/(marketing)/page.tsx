@@ -9,7 +9,7 @@ const tools = [
 ];
 
 export default function LandingPage() {
-  const checkout = process.env.HOTMART_CHECKOUT_URL;
+  // Publicação: const checkout = process.env.HOTMART_CHECKOUT_URL;
   return (
     <main className="mx-auto max-w-5xl px-5 py-10">
       <header className="mb-10 flex items-center justify-between gap-4">
@@ -27,16 +27,21 @@ export default function LandingPage() {
             Um ciclo de cada vez. O próximo passo, hoje.
           </h1>
           <p className="mt-4 max-w-xl text-mute">
-            O Forja organiza planejamento, execução e revisão em ciclos de 30 dias. A landing é pública. O aplicativo, o histórico e a sincronização exigem uma assinatura ativa.
+            O Forja organiza planejamento, execução e revisão em ciclos de 30 dias. Nesta fase de teste, crie uma conta para usar o aplicativo e guardar seus registros.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
+            {/* Publicação: botão de compra na Hotmart.
             {checkout ? (
               <a href={checkout} className="rounded-xl bg-gradient-to-br from-[#ff9138] to-[#e96613] px-5 py-3 font-bold text-[#17191c]">
                 Assinar na Hotmart
               </a>
             ) : null}
-            <Link href="/signup" className="rounded-xl border border-line px-5 py-3 font-semibold">
-              Já assinei — criar conta
+            */}
+            <Link href="/signup" className="rounded-xl bg-gradient-to-br from-[#ff9138] to-[#e96613] px-5 py-3 font-bold text-[#17191c]">
+              Criar conta
+            </Link>
+            <Link href="/login" className="rounded-xl border border-line px-5 py-3 font-semibold">
+              Já tenho conta
             </Link>
           </div>
         </div>
@@ -54,9 +59,13 @@ export default function LandingPage() {
         <h2 className="text-2xl font-bold">Como o acesso funciona</h2>
         <ol className="mt-4 space-y-2 text-sm text-mute">
           <li>1. Sem conta, você vê só esta página.</li>
+          <li>2. Crie uma conta com seu e-mail e uma senha.</li>
+          <li>3. Depois de entrar, o ciclo, as ferramentas e o histórico ficam liberados.</li>
+          {/* Publicação:
           <li>2. A compra acontece na Hotmart. O Forja não processa o pagamento.</li>
           <li>3. Depois da compra aprovada, crie a conta com o mesmo e-mail.</li>
           <li>4. Com a assinatura ativa, o ciclo, as ferramentas e o histórico ficam liberados.</li>
+          */}
         </ol>
       </section>
     </main>

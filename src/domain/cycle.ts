@@ -1,5 +1,6 @@
 import { shiftDay, today } from "./dates";
-import type { ForjaAction, ForjaState } from "./types";
+import { recordedDays } from "./records";
+import type { AppData, ForjaAction, ForjaState } from "./types";
 
 export const FOCUS_AREAS: [string, string][] = [
   ["rotina", "Rotina e organização"],
@@ -111,6 +112,23 @@ export interface CycleStats {
   planned: number;
   actions: number;
   remaining: number;
+}
+
+export function withRecordedActivity(state: ForjaState, data: AppData): ForjaState {
+  const days = recordedDays(data);
+  if (!days.length) return state;
+  let done = state.done;
+  let cloned = false;
+  for (const day of days) {
+    const bucket = done?.[day];
+    if (bucket && Object.values(bucket).some(Boolean)) continue;
+    if (!cloned) {
+      done = { ...(state.done || {}) };
+      cloned = true;
+    }
+    done[day] = { registro: true };
+  }
+  return cloned ? { ...state, done } : state;
 }
 
 export function cycleStats(state: ForjaState, day = today()): CycleStats {

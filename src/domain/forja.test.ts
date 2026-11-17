@@ -3,7 +3,7 @@ import { defaultAppData } from "@/domain/types";
 import { missionStatus, validateNewMission } from "@/domain/missions";
 import { bossState } from "@/domain/bosses";
 import { parsePortion, calcMacroGoals, calcWaterGoal } from "@/domain/diet";
-import { buildPlan, cycleStats, recommendedTools } from "@/domain/cycle";
+import { buildPlan, cycleStats, recommendedTools, withRecordedActivity } from "@/domain/cycle";
 import { defaultForja } from "@/domain/types";
 import { parseBackup, toBackup } from "@/domain/backup";
 import { totalXp, levelFromXp } from "@/domain/xp";
@@ -68,6 +68,18 @@ describe("ciclo", () => {
     expect(stats.today).toBe(1);
     expect(stats.total).toBe(1);
     expect(stats.elapsed).toBe(1);
+  });
+
+  it("conta um dia que só tem registro de ferramenta", () => {
+    const plan = buildPlan({ ...defaultForja(), focus: "saude", time: "30", selectedTools: ["agua"] }, "2026-11-11", 10);
+    const data = defaultAppData();
+    data.d.agua = [{ id: 1, d: "2026-11-11", ml: 300 }];
+    const stats = cycleStats(withRecordedActivity(plan, data), "2026-11-11");
+    expect(stats.today).toBe(0);
+    expect(stats.days).toBe(1);
+    expect(stats.total).toBe(1);
+    expect(stats.streak).toBe(1);
+    expect(plan.done["2026-11-11"]).toBeUndefined();
   });
 });
 

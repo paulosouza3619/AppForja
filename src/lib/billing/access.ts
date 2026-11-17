@@ -1,7 +1,3 @@
-import { accessAllowed } from "@/lib/billing/map-event";
-import { createAdminSupabase } from "@/lib/supabase/admin";
-import { createServerSupabase } from "@/lib/supabase/server";
-
 export function billingEnforced(): boolean {
   return process.env.BILLING_ENFORCED === "true";
 }
@@ -11,6 +7,12 @@ export function allowOverdue(): boolean {
 }
 
 export async function resolveAccess(email: string, userId: string): Promise<{ allowed: boolean; status: string }> {
+  // Fase de teste: qualquer conta do Supabase entra. Na publicação, apague o return e use o bloco abaixo.
+  void email;
+  void userId;
+  return { allowed: true, status: "bypass" };
+
+  /*
   if (!billingEnforced()) return { allowed: true, status: "bypass" };
   const supabase = await createServerSupabase();
   if (!supabase) return { allowed: false, status: "config" };
@@ -21,4 +23,5 @@ export async function resolveAccess(email: string, userId: string): Promise<{ al
   const { data } = await supabase.from("entitlements").select("status").eq("email", email.toLowerCase()).maybeSingle();
   const status = data?.status || "none";
   return { allowed: accessAllowed(status, allowOverdue()), status };
+  */
 }

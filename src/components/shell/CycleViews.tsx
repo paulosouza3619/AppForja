@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FOCUS_AREAS, cycleStats, performanceWindow } from "@/domain/cycle";
+import { FOCUS_AREAS, cycleStats, performanceWindow, withRecordedActivity } from "@/domain/cycle";
 import { MODULES, MODULE_GROUPS, MODULE_IMAGES } from "@/domain/catalog";
 import { formatDay, today } from "@/domain/dates";
 import { defaultForja } from "@/domain/types";
@@ -14,8 +14,9 @@ import { useAppStore, useForja } from "@/store/app-store";
 import { Button, Panel, useToast } from "@/components/ui";
 
 export function EvolutionView() {
+  const data = useAppStore((s) => s.data);
   const forja = useForja();
-  const stats = cycleStats(forja);
+  const stats = cycleStats(withRecordedActivity(forja, data));
   const labels = Object.fromEntries(FOCUS_AREAS);
   return (
     <div>
@@ -51,9 +52,11 @@ export function EvolutionView() {
 
 export function PerformanceView() {
   const toast = useToast();
+  const data = useAppStore((s) => s.data);
   const forja = useForja();
-  const stats = cycleStats(forja);
-  const windowStats = performanceWindow(forja);
+  const measured = withRecordedActivity(forja, data);
+  const stats = cycleStats(measured);
+  const windowStats = performanceWindow(measured);
   const max = Math.max(1, ...windowStats.series.map((item) => item.n), forja.actions.length);
   const [good, setGood] = useState(forja.review?.good || "");
   const [block, setBlock] = useState(forja.review?.block || "");
@@ -108,8 +111,9 @@ export function PerformanceView() {
 }
 
 export function AdvisorView() {
+  const data = useAppStore((s) => s.data);
   const forja = useForja();
-  const stats = cycleStats(forja);
+  const stats = cycleStats(withRecordedActivity(forja, data));
   const total = forja.actions.length;
   const done = stats.today;
   const title = !total ? "Defina seu próximo passo." : done === total ? "Mantenha a consistência." : done === 0 ? "Saia da inércia." : "Continue executando.";

@@ -13,9 +13,16 @@ const NAV = [
   ["/evolucao", "Minha evolução"],
   ["/ferramentas", "Ferramentas"],
   ["/desempenho", "Desempenho"],
+  ["/ferramentas/inicio", "Progresso"],
   ["/orientador", "Orientador"],
   ["/perfil", "Perfil"],
 ];
+
+function navActive(href: string, pathname: string): boolean {
+  if (href === "/ferramentas/inicio") return pathname === "/ferramentas/inicio";
+  if (href === "/ferramentas") return pathname === "/ferramentas" || (pathname.startsWith("/ferramentas/") && pathname !== "/ferramentas/inicio");
+  return pathname === href;
+}
 
 function SyncBridge({ ready }: { ready: boolean }) {
   useEffect(() => {
@@ -41,7 +48,7 @@ function SyncBridge({ ready }: { ready: boolean }) {
   return null;
 }
 
-export function AppFrame({ email, overdue, children }: { email: string; overdue: boolean; children: ReactNode }) {
+export function AppFrame({ children }: { email: string; overdue: boolean; children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [ready, setReady] = useState(() => useAppStore.persist.hasHydrated());
@@ -71,11 +78,13 @@ export function AppFrame({ email, overdue, children }: { email: string; overdue:
     <ToastProvider>
       <SyncBridge ready={ready} />
       <div className="mx-auto min-h-screen max-w-[1240px] px-4 py-6 pb-16">
+        {/* Publicação: aviso de assinatura em atraso.
         {overdue ? (
           <p className="mb-4 rounded-xl border border-gold px-4 py-3 text-sm text-gold" role="status">
             Sua assinatura está em atraso. Regularize na Hotmart para não perder o acesso. Conta: {email}
           </p>
         ) : null}
+        */}
         {!ready ? <p className="text-mute">Carregando seus dados…</p> : null}
         {ready && conflict ? (
           <Panel title="Dados diferentes encontrados">
@@ -91,7 +100,7 @@ export function AppFrame({ email, overdue, children }: { email: string; overdue:
         {ready && !conflict && onboarded && pathname !== "/onboarding" ? (
           <nav className="mb-5 flex gap-2 overflow-x-auto rounded-2xl border border-line bg-card p-2" aria-label="Seções">
             {NAV.map(([href, label]) => {
-              const active = pathname === href || (href === "/ferramentas" && pathname.startsWith("/ferramentas"));
+              const active = navActive(href, pathname);
               return (
                 <Link key={href} href={href} className={`whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold ${active ? "bg-ember text-[#15181b]" : "text-mute"}`}>
                   {label}

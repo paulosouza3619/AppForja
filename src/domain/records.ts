@@ -33,6 +33,25 @@ export function hasAnyLogs(data: AppData): boolean {
   return Object.values(data.d).some((rows) => Array.isArray(rows) && rows.length > 0);
 }
 
+const DAY_KEY = /^\d{4}-\d{2}-\d{2}$/;
+
+export function recordedDays(data: AppData): string[] {
+  const days = new Set<string>();
+  for (const rows of Object.values(data.d || {})) {
+    if (!Array.isArray(rows)) continue;
+    for (const entry of rows) {
+      if (entry && DAY_KEY.test(entry.d || "")) days.add(entry.d);
+    }
+  }
+  for (const bucket of [data.hc, data.cc]) {
+    for (const [day, flags] of Object.entries(bucket || {})) {
+      if (!DAY_KEY.test(day)) continue;
+      if (Object.values(flags || {}).some(Boolean)) days.add(day);
+    }
+  }
+  return [...days];
+}
+
 export function newId(): number {
   return Date.now();
 }
